@@ -1,4 +1,4 @@
-### figure 3 plot for 2nd course project, Exploratory Data Analysis JHU
+### figure 4 plot for 2nd course project, Exploratory Data Analysis JHU
 ### 
 
 ### This assignment uses data sourced from the US Environmental Protection Agency
@@ -22,23 +22,31 @@ if (!file.exists('summarySCC_PM25.rds')) {
 emissions.data <- as.tibble(readRDS('summarySCC_PM25.rds'))
 code.table <- as.tibble(readRDS('Source_Classification_Code.rds'))
 
+### add emission names (some columns only) to emissions.data table
+
+emissions.data <- left_join(emissions.data,
+                            code.table[,c('SCC','Short.Name','EI.Sector','SCC.Level.One','SCC.Level.Two')],
+                            by='SCC')
+
 ### group by year, and find total emissions (sum of all types) per year
 ### secondary grouping by year ('factor'ed version)
-### restrict data to Baltimore City, Maryland (fips == '24510)
 
 yearly.total <- emissions.data %>%
-  filter(fips == '24510') %>%
-  group_by(year, type = factor(type)) %>% 
+  filter((grep('coal', Short.Name, ignore.case = TRUE) |
+            grep('coal', EI.Sector, ignore.case = TRUE) |
+            grep('coal', SCC.Level.One, ignore.case = TRUE) |
+            grep('coal', SCC.Level.Two, ignore.case = TRUE))) %>%
+  group_by(year,Short.name) %>% 
   summarise(Emissions = sum(Emissions))
 
-png(filename = 'plot3.png', width = 480, height = 480)
+png(filename = 'plot4.png', width = 480, height = 480)
 
 myplot <- ggplot(yearly.total,
-                 aes (x = year, y= Emissions, colour = type)) +
-                 geom_line() +
-                 labs(x = 'Year') + labs(y = 'PM 2.5 Emissions (tonnes)') +
-                 labs(title = 'PM2.5 emissions Baltimore City, Maryland, by type') +
-                 labs(subtitle = '1999 to 2008')
+                 aes (x = year, y= Emissions, colour = Short.name)) +
+  geom_line() +
+  labs(x = 'Year') + labs(y = 'PM 2.5 Emissions (tonnes)') +
+  labs(title = 'Coal-related PM2.5 emissions USA, by source') +
+  labs(subtitle = '1999 to 2008')
 
 print(myplot)
 

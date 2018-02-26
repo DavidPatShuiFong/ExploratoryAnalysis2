@@ -30,7 +30,6 @@ yearly.total <- emissions.data %>%
   group_by(year) %>% 
   summarise(Emissions = sum(Emissions))
 
-yearly.total
 png(filename = 'plot2.png', width = 480, height = 480)
 
 plot(unlist(yearly.total$year), unlist(yearly.total$Emissions),type='l',

@@ -5,6 +5,7 @@
 ### Fine particular matter (PM2.5), National Emissions Inventory
 
 library(tidyverse)
+library(dplyr)
 library(ggplot2)
 
 ### check if data file already present, if not, then download the file (which is a .zip archive)
@@ -18,5 +19,20 @@ if (!file.exists('summarySCC_PM25.rds')) {
   unzip('exdataNEI.zip')
 }
 
-summary.emissions <- as.tibble(readRDS('summarySCC_PM25.rds'))
+emissions.data <- as.tibble(readRDS('summarySCC_PM25.rds'))
 code.table <- as.tibble(readRDS('Source_Classification_Code.rds'))
+
+### group by year, and find total emissions (sum of all types) per year
+
+yearly.total <- emissions.data %>% 
+  group_by(year) %>% 
+  summarise(Emissions = sum(Emissions))
+
+png(filename = 'plot1.png', width = 480, height = 480)
+
+plot(unlist(yearly.total$year), unlist(yearly.total$Emissions),type='l',
+     main = 'Total PM2.5 emission USA, 1999 to 2008',
+     xlab = 'Year',
+     ylab = 'Tonnes of emission')
+
+dev.off()

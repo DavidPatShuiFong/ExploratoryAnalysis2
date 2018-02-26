@@ -23,13 +23,14 @@ emissions.data <- as.tibble(readRDS('summarySCC_PM25.rds'))
 code.table <- as.tibble(readRDS('Source_Classification_Code.rds'))
 
 ### group by year, and find total emissions (sum of all types) per year
-### secondary grouping by year ('factor'ed version)
+### secondary grouping by type ('factor'ed version)
 ### restrict data to Baltimore City, Maryland (fips == '24510)
 
 yearly.total <- emissions.data %>%
   filter(fips == '24510') %>%
   group_by(year, type = factor(type)) %>% 
-  summarise(Emissions = sum(Emissions))
+  summarise(Emissions = sum(Emissions)) %>%
+  arrange(year)
 
 png(filename = 'plot3.png', width = 480, height = 480)
 

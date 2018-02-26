@@ -26,7 +26,8 @@ code.table <- as.tibble(readRDS('Source_Classification_Code.rds'))
 
 yearly.total <- emissions.data %>% 
   group_by(year) %>% 
-  summarise(Emissions = sum(Emissions))
+  summarise(Emissions = sum(Emissions)) %>%
+  arrange(year)
 
 png(filename = 'plot1.png', width = 480, height = 480)
 
